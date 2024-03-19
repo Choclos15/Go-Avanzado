@@ -36,5 +36,5 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println(Balance())
+	fmt.Println(Balance(&lock))
 }
