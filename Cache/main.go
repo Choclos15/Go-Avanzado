@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"sync"
-	"time"
 )
 
 func Fibonacci(n int) int {
@@ -52,22 +49,22 @@ func GetFibonacci(n int) (interface{}, error) {
 	return Fibonacci(n), nil
 }
 
-func main() {
-	cache := NewCache(GetFibonacci)
-	fibo := []int{42, 40, 41, 42, 38}
-	var wg sync.WaitGroup
+// func main() {
+// 	cache := NewCache(GetFibonacci)
+// 	fibo := []int{42, 40, 41, 42, 38}
+// 	var wg sync.WaitGroup
 
-	for _, n := range fibo {
-		wg.Add(1)
-		go func(index int) {
-			defer wg.Done()
-			start := time.Now
-			value, err := cache.Get(n)
-			if err != nil {
-				log.Println(err)
-			}
-			fmt.Printf("%d, %s, %d\n", n, time.Since(start()), value)
-		}(n)
-	}
-	wg.Wait()
-}
+// 	for _, n := range fibo {
+// 		wg.Add(1)
+// 		go func(index int) {
+// 			defer wg.Done()
+// 			start := time.Now
+// 			value, err := cache.Get(n)
+// 			if err != nil {
+// 				log.Println(err)
+// 			}
+// 			fmt.Printf("%d, %s, %d\n", n, time.Since(start()), value)
+// 		}(n)
+// 	}
+// 	wg.Wait()
+// }
