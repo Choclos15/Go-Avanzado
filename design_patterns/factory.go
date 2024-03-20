@@ -72,10 +72,10 @@ func printNameAndStock(p IProduct) {
 	fmt.Printf("Product Name: %s\nStock: %d\n", p.getName(), p.getStock())
 }
 
-func main() {
-	laptop, _ := GetComputerFactory("Laptop")
-	desktop, _ := GetComputerFactory("Desktop")
+// func main() {
+// 	laptop, _ := GetComputerFactory("Laptop")
+// 	desktop, _ := GetComputerFactory("Desktop")
 
-	printNameAndStock(laptop)
-	printNameAndStock(desktop)
-}
+// 	printNameAndStock(laptop)
+// 	printNameAndStock(desktop)
+// }
