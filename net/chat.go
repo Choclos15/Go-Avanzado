@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"net"
 )
 
@@ -27,22 +28,58 @@ func HandleConnection(conn net.Conn) {
 
 	clientName := conn.RemoteAddr().String()
 
-	message <- fmt.Sprintf("Welcome to the server, your name %s", clientName)
+	message <- fmt.Sprintf("Welcome to the server, your name %s\n", clientName)
 
-	messages <- fmt.Sprintf("New client is here, name %s", clientName)
+	messages <- fmt.Sprintf("New client is here, name %s\n", clientName)
 	incomingClients <- message
 
 	inputMessage := bufio.NewScanner(conn)
 	for inputMessage.Scan() {
-		messages <- fmt.Sprintf("%s:%d", clientName, inputMessage.Text())
+		messages <- fmt.Sprintf("%s:%s\n", clientName, inputMessage.Text())
 	}
 
 	leavingClients <- message
 	messages <- fmt.Sprintf("%s said bye", clientName)
 }
 
-func MessageWrite(conn net.Conn, message <-chan string) {
+func MessageWrite(conn net.Conn, messages <-chan string) {
 	for message := range messages {
 		fmt.Fprintln(conn, message)
+	}
+}
+
+func Broadcast() {
+	clients := make(map[Client]bool)
+
+	for {
+		select {
+		case message := <-messages:
+			for client := range clients {
+				client <- message
+			}
+		case newClient := <-incomingClients:
+			clients[newClient] = true
+		case leavingClient := <-leavingClients:
+			delete(clients, leavingClient)
+			close(leavingClient)
+		}
+	}
+}
+
+func main() {
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *host, *port))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go Broadcast()
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		go HandleConnection(conn)
 	}
 }
